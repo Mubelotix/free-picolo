@@ -10,10 +10,9 @@ pub enum AppState {
 }
 
 pub struct App {
-    items: Vec<Item>,
     state: AppState,
     players: Vec<String>,
-    storyline: Vec<usize>,
+    storyline: Vec<String>,
 }
 
 impl Component for App {
@@ -22,7 +21,6 @@ impl Component for App {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            items: parse_items(),
             state: AppState::SelectPlayers,
             players: Vec::new(),
             storyline: Vec::new(),

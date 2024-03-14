@@ -1,8 +1,6 @@
-use std::{collections::HashMap, hash::Hash};
-
+use std::collections::HashMap;
 use serde_json::Value;
 use serde::{Serialize, Deserialize};
-
 
 #[derive(Deserialize, Debug)]
 struct RawItem {
