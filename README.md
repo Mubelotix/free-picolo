@@ -11,5 +11,5 @@ All the content from the original game is available for free in this app.
 - Decompile the APK using JADX `jadx -d picolo com.picolo.android.apk`
 - Install Realm Studio and open the file `picolo/resources/assets/default-7.realm`
 - Press the File>Save Data>JSON
-- Move the obtained file to the root of this project and rename it to `data.json`
+- Move the obtained file to `data/source.json`
 - (Optional) From the json, remove the useless array containing numbers from 2 to 65000 as strings
