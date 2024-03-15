@@ -32,7 +32,7 @@ pub struct App {
     state: AppState,
     players: Vec<String>,
     pack: Pack,
-    storyline: Vec<String>,
+    storyline: Vec<(usize, String)>,
     party_duration: usize,
     max_rule_duration: usize,
 }
@@ -174,9 +174,16 @@ impl Component for App {
                 )
             },
             AppState::Play(storyline_progress) => {
-                let message = match self.storyline.get(storyline_progress) {
-                    Some(message) => message,
-                    None => "Game over!",
+                let (ty, message) = match self.storyline.get(storyline_progress) {
+                    Some((ty, message)) => (*ty, message.as_str()),
+                    None => (0, "Game over!"),
+                };
+                
+                let (opt_title, background_color) = match ty {
+                    2 => (Some("Virus"), "#E6BB01"),
+                    5 => (Some("Pénalité Ultime"), "#E41100"),
+                    14 => (Some("Jeu"), "#00B506"),
+                    _ => (None, "#1C566B"),
                 };
 
                 template_html!("templates/play.html", ...)

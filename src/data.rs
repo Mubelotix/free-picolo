@@ -7,7 +7,7 @@ use rand::{seq::{IteratorRandom, SliceRandom}, Rng, RngCore};
 pub struct SplitItem {
     pub cycle_state: bool,
     // 1: random
-    // 2: règles personnelles
+    // 2: virus (règles personnelles)
     // 3: règles collectives
     // 4: thème
     // 5: pénalités ultimes
@@ -16,7 +16,7 @@ pub struct SplitItem {
     // 8-9-10-13: war
     // 11: thème, war
     // 12: le plus de, war
-    // 14: tu préfères
+    // 14: jeu (tu préfères)
     // 15: story
     // 16: observation, bar
     // 17: payer, bar
@@ -79,7 +79,7 @@ impl RngCore for JsRandom {
     }
 }
 
-pub fn build_storyline(pack: Pack, party_duration: usize, max_rule_duration: usize, players: &[String]) -> Vec<String> {
+pub fn build_storyline(pack: Pack, party_duration: usize, max_rule_duration: usize, players: &[String]) -> Vec<(usize, String)> {
     let mut items = get_items(pack);
     let mut storyline = Vec::new();
 
@@ -106,7 +106,7 @@ pub fn build_storyline(pack: Pack, party_duration: usize, max_rule_duration: usi
         }
 
         let position = JsRandom.gen_range(0..=storyline.len());
-        storyline.insert(position, text);
+        storyline.insert(position, (item.ty, text));
 
         if let Some(key) = item.key {
             if let Some(next_item) = items.iter().filter(|i2| i2.parent_key == Some(key)).choose(&mut JsRandom) {
@@ -122,7 +122,7 @@ pub fn build_storyline(pack: Pack, party_duration: usize, max_rule_duration: usi
                     let penalty_number = JsRandom.gen_range(1..=players.len());
                     text = text.replace('$', &penalty_number.to_string());
                 }
-                storyline.insert(next_position, text);
+                storyline.insert(next_position, (next_item.ty, text));
             }
         }
     }
