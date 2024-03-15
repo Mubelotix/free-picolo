@@ -71,21 +71,53 @@ impl RngCore for JsRandom {
 
 pub fn build_storyline(pack: &'static str, n: usize, players: Vec<String>) -> Vec<String> {
     let items = get_items(pack);
+
+    for item in &items {
+        if item.cycle_state {
+            println!("{:#?}", item);
+        }
+    }
+
     let mut storyline = Vec::new();
 
     while storyline.len() < n {
-        let item = items.iter().filter(|item| item.ty != 15 && item.nb_players <= players.len()).choose(&mut JsRandom).unwrap();
+        let item = items.iter()
+            .filter(|item| item.ty != 15 && item.nb_players <= players.len() && item.parent_key.is_none())
+            .choose(&mut JsRandom)
+            .unwrap();
+
         let mut selected_players = players.iter().choose_multiple(&mut JsRandom, item.nb_players);
         selected_players.shuffle(&mut JsRandom);
+
         let mut text = item.text.to_string();
-        for player in selected_players {
+        for player in &selected_players {
             text = text.replacen("%s", player, 1);
         }
         if text.contains('$') {
             let penalty_number = JsRandom.gen_range(1..=players.len());
             text = text.replace('$', &penalty_number.to_string());
         }
-        storyline.push(text);
+
+        let position = JsRandom.gen_range(0..=storyline.len());
+        storyline.insert(position, text);
+
+        if let Some(key) = item.key {
+            if let Some(next_item) = items.iter().filter(|i2| i2.parent_key == Some(key)).choose(&mut JsRandom) {
+                let next_position = match item.ty {
+                    2 | 3 => JsRandom.gen_range(position + 1..=storyline.len()),
+                    _ => position + 1,
+                };
+                let mut text = next_item.text.to_string();
+                for player in selected_players {
+                    text = text.replacen("%s", player, 1);
+                }
+                if text.contains('$') {
+                    let penalty_number = JsRandom.gen_range(1..=players.len());
+                    text = text.replace('$', &penalty_number.to_string());
+                }
+                storyline.insert(next_position, text);
+            }
+        }
     }
 
     storyline
