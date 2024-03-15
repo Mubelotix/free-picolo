@@ -15,7 +15,7 @@ pub enum AppState {
     SelectPlayers,
     SelectPack,
     SelectSettings,
-    Play,
+    Play(usize),
 }
 
 pub enum AppMsg {
@@ -58,7 +58,12 @@ impl Component for App {
                 match self.state {
                     AppState::SelectPack => self.state = AppState::SelectPlayers,
                     AppState::SelectSettings => self.state = AppState::SelectPack,
-                    AppState::Play => self.state = AppState::SelectSettings,
+                    AppState::Play(storyline_progress) => {
+                        match storyline_progress > 0 {
+                            true => self.state = AppState::Play(storyline_progress - 1),
+                            false => self.state = AppState::SelectSettings,
+                        }
+                    },
                     _ => (),
                 }
                 true
@@ -74,9 +79,13 @@ impl Component for App {
                             self.max_rule_duration,
                             &self.players,
                         );
-                        self.state = AppState::Play
+                        self.state = AppState::Play(0);
                     },
-                    _ => (),
+                    AppState::Play(storyline_progress) => {
+                        if storyline_progress < self.storyline.len() {
+                            self.state = AppState::Play(storyline_progress + 1);
+                        }
+                    },
                 }
                 true
             },
@@ -118,10 +127,6 @@ impl Component for App {
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
-        false
-    }
-
     fn view(&self, ctx: &Context<Self>) -> Html {
         let onclick_back = ctx.link().callback(|_| AppMsg::Back);
         let onclick_next = ctx.link().callback(|_| AppMsg::Next);
@@ -160,7 +165,14 @@ impl Component for App {
                     ...
                 )
             },
-            AppState::Play => template_html!("templates/play.html"),
+            AppState::Play(storyline_progress) => {
+                let message = match self.storyline.get(storyline_progress) {
+                    Some(message) => message,
+                    None => "Game over!",
+                };
+
+                template_html!("templates/play.html", ...)
+            },
         }
     }
 }
