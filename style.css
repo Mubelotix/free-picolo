@@ -38,7 +38,7 @@ button {
 
 /* Select players */
 
-#player-list {
+#player-list, #pack-selector {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -74,6 +74,22 @@ button {
 
 .player-list-player button {
     margin-left: 0;
+}
+
+/* Pack selector */
+
+#pack-selector-list {
+    padding: 0 15%;
+}
+
+.pack-selector-separator {
+    width: 100%;
+    margin: 0.7rem 0;
+    border-bottom: 1px solid #2c3f50;    
+}
+
+.pack-selector-pack h3, .pack-selector-pack p {
+    margin: 0.2rem 0;
 }
 
 /* Playing screen */
