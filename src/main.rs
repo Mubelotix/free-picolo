@@ -75,7 +75,9 @@ impl Component for App {
                             *player = player.trim().to_string();
                         }
                         self.players.retain(|player| !player.is_empty());
-                        self.state = AppState::SelectPack;
+                        if !self.players.is_empty() {
+                            self.state = AppState::SelectPack;
+                        }
                     },
                     AppState::SelectPack => self.state = AppState::SelectSettings,
                     AppState::SelectSettings => {
