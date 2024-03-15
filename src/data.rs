@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use rand::{seq::IteratorRandom, RngCore};
+use rand::{seq::{IteratorRandom, SliceRandom}, RngCore};
 
 #[derive(Deserialize, Debug)]
 pub struct SplitItem {
@@ -75,7 +75,13 @@ pub fn build_storyline(pack: &'static str, n: usize, players: Vec<String>) -> Ve
 
     while storyline.len() < n {
         let item = items.iter().filter(|item| item.ty != 15 && item.nb_players <= players.len()).choose(&mut JsRandom).unwrap();
-        storyline.push(item.text.to_string());
+        let mut selected_players = players.iter().choose_multiple(&mut JsRandom, item.nb_players);
+        selected_players.shuffle(&mut JsRandom);
+        let mut text = item.text.to_string();
+        for player in selected_players {
+            text = text.replacen("%s", player, 1);
+        }
+        storyline.push(text);
     }
 
     storyline
@@ -85,5 +91,5 @@ pub fn build_storyline(pack: &'static str, n: usize, players: Vec<String>) -> Ve
 fn test() {
     let players = vec!["Alice".to_string(), "Bob".to_string()];
     let storyline = build_storyline("default", 20, players);
-    println!("{:?}", storyline);
+    println!("{:#?}", storyline);
 }
