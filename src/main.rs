@@ -18,14 +18,6 @@ pub enum AppState {
     Play,
 }
 
-pub enum Pack {
-    Default,
-    Hot,
-    Silly,
-    War,
-    Bar,
-}
-
 pub enum AppMsg {
     Back,
     Next,
@@ -75,7 +67,15 @@ impl Component for App {
                 match self.state {
                     AppState::SelectPlayers => self.state = AppState::SelectPack,
                     AppState::SelectPack => self.state = AppState::SelectSettings,
-                    AppState::SelectSettings => self.state = AppState::Play,
+                    AppState::SelectSettings => {
+                        self.storyline = build_storyline(
+                            self.pack,
+                            self.party_duration,
+                            self.max_rule_duration,
+                            &self.players,
+                        );
+                        self.state = AppState::Play
+                    },
                     _ => (),
                 }
                 true

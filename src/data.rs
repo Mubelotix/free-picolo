@@ -35,14 +35,22 @@ pub struct SplitItem {
     pub nb_players: usize,
 }
 
-pub fn get_items(pack: &'static str) -> Vec<SplitItem> {
+#[derive(Clone, Copy, Debug)]
+pub enum Pack {
+    Default,
+    Hot,
+    Silly,
+    War,
+    Bar,
+}
+
+pub fn get_items(pack: Pack) -> Vec<SplitItem> {
     let data: &[u8] = match pack {
-        "bar" => include_bytes!("../data/fr-bar.bin"),
-        "default" => include_bytes!("../data/fr-default.bin"),
-        "hot" => include_bytes!("../data/fr-hot.bin"),
-        "silly" => include_bytes!("../data/fr-silly.bin"),
-        "war" => include_bytes!("../data/fr-war.bin"),
-        _ => panic!("Unknown pack"),
+        Pack::Bar => include_bytes!("../data/fr-bar.bin"),
+        Pack::Default => include_bytes!("../data/fr-default.bin"),
+        Pack::Hot => include_bytes!("../data/fr-hot.bin"),
+        Pack::Silly => include_bytes!("../data/fr-silly.bin"),
+        Pack::War => include_bytes!("../data/fr-war.bin"),
     };
     bincode::deserialize::<Vec<SplitItem>>(data).unwrap()
 }
@@ -71,7 +79,7 @@ impl RngCore for JsRandom {
     }
 }
 
-pub fn build_storyline(pack: &'static str, n: usize, max_rule_duration: usize, players: Vec<String>) -> Vec<String> {
+pub fn build_storyline(pack: Pack, party_duration: usize, max_rule_duration: usize, players: &[String]) -> Vec<String> {
     let items = get_items(pack);
 
     for item in &items {
@@ -82,7 +90,7 @@ pub fn build_storyline(pack: &'static str, n: usize, max_rule_duration: usize, p
 
     let mut storyline = Vec::new();
 
-    while storyline.len() < n {
+    while storyline.len() < party_duration {
         let item = items.iter()
             .filter(|item| item.ty != 15 && item.nb_players <= players.len() && item.parent_key.is_none())
             .choose(&mut JsRandom)
@@ -127,7 +135,7 @@ pub fn build_storyline(pack: &'static str, n: usize, max_rule_duration: usize, p
 
 #[test]
 fn test() {
-    let players = vec!["Alice".to_string(), "Bob".to_string(), "Charlie".to_string()];
-    let storyline = build_storyline("default", 20, 15, players);
+    let players = ["Alice".to_string(), "Bob".to_string(), "Charlie".to_string()];
+    let storyline = build_storyline(Pack::Default, 20, 15, &players);
     println!("{:#?}", storyline);
 }
