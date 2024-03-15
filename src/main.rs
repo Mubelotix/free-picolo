@@ -22,7 +22,8 @@ pub enum AppMsg {
     Back,
     Next,
     AddPlayer,
-    OnPlayerChanged(web_sys::Event)
+    OnPlayerChanged(web_sys::Event),
+    OnPlayerRemoved(web_sys::MouseEvent),
 }
 
 pub struct App {
@@ -40,7 +41,7 @@ impl Component for App {
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             state: AppState::SelectPlayers,
-            players: Vec::new(),
+            players: vec![String::new(), String::new()],
             storyline: Vec::new(),
             storyline_duration: 30,
             max_rule_duration: 12,
@@ -76,11 +77,17 @@ impl Component for App {
                 let target: web_sys::HtmlInputElement = target.dyn_into().unwrap();
                 let i: usize = target.id().trim_start_matches("player-input-").parse().unwrap();
                 let value = target.value();
-                log!("{:?}", self.players);
-
                 self.players[i] = value;
 
                 false
+            }
+            AppMsg::OnPlayerRemoved(event) => {
+                let Some(target) = event.target() else {return true};
+                let target: web_sys::Element = target.dyn_into().unwrap();
+                let i: usize = target.id().trim_start_matches("player-remove-").parse().unwrap();
+                self.players.remove(i);
+
+                true
             }
         }
     }
@@ -97,11 +104,13 @@ impl Component for App {
             AppState::SelectPlayers => {
                 let player_iter = self.players.iter().map(|s| s.to_owned());
                 let i_iter = 0..self.players.len();
+                let i2_iter = i_iter.clone();
                 let onclick_add = ctx.link().callback(|_| AppMsg::AddPlayer);
 
                 template_html!(
                     "templates/select_players.html",
                     onchange = { ctx.link().callback(AppMsg::OnPlayerChanged) },
+                    onclick_remove = { ctx.link().callback(AppMsg::OnPlayerRemoved) },
                     ...
                 )
             },

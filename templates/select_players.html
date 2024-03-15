@@ -3,7 +3,7 @@
     <div id="player-list">
         <div iter class="player-list-player">
             <input type="text" id="player-input-{{i_iter}}" value={{player_iter}} onchange={{onchange}} />
-            <button>Remove</button>
+            <button id="player-remove-{{i2_iter}}" onclick={{onclick_remove}}>Remove</button>
         </div>
         <button onclick={{onclick_add}}>Add</button>
     </div>
