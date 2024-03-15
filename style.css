@@ -3,12 +3,82 @@ html, body {
     padding: 0;
     font-family: "Roboto", sans-serif;
     height: 100%;
+    background-color: #1C566B;
+    color: white;
+}
+
+button, input {
+    outline: none;
+    border: none;
+    border-radius: 0.4rem;
+    height: 1.5rem;
+    padding: 0 0.4rem;
+    margin: 0 0.7rem;
+}
+
+button {
+    background-color: #ccc;
+}
+
+#bottom-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 0.7rem 0;
+}
+
+#bottom-buttons>button {
+    background-color: #32C4FF;
+    flex-grow: 1;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    height: 2rem;
+}
+
+/* Select players */
+
+#player-list {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#player-list-list {
+    width: 100%;
+}
+
+#player-list>button, .player-list-player {
+    margin: .7rem 0;
+}
+
+.player-list-player {
+    display: flex;
+    flex-direction: row;
+}
+
+.player-list-player input, .player-list-player button, #player-list-list>button {
+    outline: none;
+    border: none;
+    border-radius: 0.4rem;
+    height: 1.5rem;
+    padding: 0 0.4rem;
+    margin: 0 0.7rem;
+}
+
+.player-list-player input {
+    flex-grow: 1;
+}
+
+.player-list-player button {
+    margin-left: 0;
 }
 
 /* Playing screen */
 
 #playing-screen {
-    color: white;
     height: 100%;
     display: flex;
     flex-direction: column;

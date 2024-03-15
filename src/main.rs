@@ -77,6 +77,8 @@ impl Component for App {
                         self.players.retain(|player| !player.is_empty());
                         if !self.players.is_empty() {
                             self.state = AppState::SelectPack;
+                        } else {
+                            self.players = vec![String::new(), String::new()];
                         }
                     },
                     AppState::SelectPack => self.state = AppState::SelectSettings,
