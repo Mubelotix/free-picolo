@@ -34,7 +34,7 @@ pub struct App {
     pack: Pack,
     storyline: Vec<(usize, String)>,
     party_duration: usize,
-    max_rule_duration: usize,
+    max_virus_duration: usize,
 }
 
 impl Component for App {
@@ -48,7 +48,7 @@ impl Component for App {
             pack: Pack::Default,
             storyline: Vec::new(),
             party_duration: 30,
-            max_rule_duration: 12,
+            max_virus_duration: 12,
         }
     }
 
@@ -84,7 +84,7 @@ impl Component for App {
                         self.storyline = build_storyline(
                             self.pack,
                             self.party_duration,
-                            self.max_rule_duration,
+                            self.max_virus_duration,
                             &self.players,
                         );
                         self.state = AppState::Play(0);
@@ -127,7 +127,7 @@ impl Component for App {
                 let value = target.value();
                 match target.id().trim_start_matches("setting-") {
                     "party-duration" => self.party_duration = value.parse().unwrap(),
-                    "max-rule-duration" => self.max_rule_duration = value.parse().unwrap(),
+                    "max-virus-duration" => self.max_virus_duration = value.parse().unwrap(),
                     _ => (),
                 }
                 false
@@ -165,7 +165,7 @@ impl Component for App {
             },
             AppState::SelectSettings => {
                 let party_duration = self.party_duration.to_string();
-                let max_rule_duration = self.max_rule_duration.to_string();
+                let max_virus_duration = self.max_virus_duration.to_string();
 
                 template_html!(
                     "templates/select_settings.html",

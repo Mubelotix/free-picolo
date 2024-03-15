@@ -79,7 +79,7 @@ impl RngCore for JsRandom {
     }
 }
 
-pub fn build_storyline(pack: Pack, party_duration: usize, max_rule_duration: usize, players: &[String]) -> Vec<(usize, String)> {
+pub fn build_storyline(pack: Pack, party_duration: usize, max_virus_duration: usize, players: &[String]) -> Vec<(usize, String)> {
     let mut items = get_items(pack);
     let mut storyline = Vec::new();
 
@@ -111,7 +111,7 @@ pub fn build_storyline(pack: Pack, party_duration: usize, max_rule_duration: usi
         if let Some(key) = item.key {
             if let Some(next_item) = items.iter().filter(|i2| i2.parent_key == Some(key)).choose(&mut JsRandom) {
                 let next_position = match item.ty {
-                    2 | 3 => JsRandom.gen_range(position + 1..=min(storyline.len(), position + max_rule_duration)),
+                    2 | 3 => JsRandom.gen_range(position + 1..=min(storyline.len(), position + max_virus_duration)),
                     _ => position + 1,
                 };
                 let mut text = next_item.text.to_string();
