@@ -66,6 +66,7 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let onclick_back = ctx.link().callback(|_| AppMsg::Back);
         let onclick_next = ctx.link().callback(|_| AppMsg::Next);
 
         match self.state {
