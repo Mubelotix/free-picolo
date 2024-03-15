@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use rand::{seq::{IteratorRandom, SliceRandom}, RngCore};
+use rand::{seq::{IteratorRandom, SliceRandom}, Rng, RngCore};
 
 #[derive(Deserialize, Debug)]
 pub struct SplitItem {
@@ -80,6 +80,10 @@ pub fn build_storyline(pack: &'static str, n: usize, players: Vec<String>) -> Ve
         let mut text = item.text.to_string();
         for player in selected_players {
             text = text.replacen("%s", player, 1);
+        }
+        if text.contains('$') {
+            let penalty_number = JsRandom.gen_range(1..=players.len());
+            text = text.replace('$', &penalty_number.to_string());
         }
         storyline.push(text);
     }
