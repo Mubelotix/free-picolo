@@ -1,6 +1,13 @@
 <main>
     <h2>List players</h2>
-    <div class="bottom-buttons">
+    <div id="player-list">
+        <div iter class="player-list-player">
+            <input type="text" id="player-input-{{i_iter}}" value={{player_iter}} onchange={{onchange}} />
+            <button>Remove</button>
+        </div>
+        <button onclick={{onclick_add}}>Add</button>
+    </div>
+    <div id="bottom-buttons">
         <button onclick={{onclick_next}}>Next</button>
     </div>
 </main>

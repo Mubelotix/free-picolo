@@ -3,6 +3,13 @@ pub use data::*;
 
 use yew::prelude::*;
 use yew_template::template_html;
+use wasm_bindgen::JsCast;
+
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
 
 pub enum AppState {
     SelectPlayers,
@@ -14,6 +21,8 @@ pub enum AppState {
 pub enum AppMsg {
     Back,
     Next,
+    AddPlayer,
+    OnPlayerChanged(web_sys::Event)
 }
 
 pub struct App {
@@ -57,6 +66,21 @@ impl Component for App {
                     _ => (),
                 }
                 true
+            },
+            AppMsg::AddPlayer => {
+                self.players.push(String::new());
+                true
+            }
+            AppMsg::OnPlayerChanged(event) => {
+                let Some(target) = event.target() else {return true};
+                let target: web_sys::HtmlInputElement = target.dyn_into().unwrap();
+                let i: usize = target.id().trim_start_matches("player-input-").parse().unwrap();
+                let value = target.value();
+                log!("{:?}", self.players);
+
+                self.players[i] = value;
+
+                false
             }
         }
     }
@@ -70,7 +94,17 @@ impl Component for App {
         let onclick_next = ctx.link().callback(|_| AppMsg::Next);
 
         match self.state {
-            AppState::SelectPlayers => template_html!("templates/select_players.html", ...),
+            AppState::SelectPlayers => {
+                let player_iter = self.players.iter().map(|s| s.to_owned());
+                let i_iter = 0..self.players.len();
+                let onclick_add = ctx.link().callback(|_| AppMsg::AddPlayer);
+
+                template_html!(
+                    "templates/select_players.html",
+                    onchange = { ctx.link().callback(AppMsg::OnPlayerChanged) },
+                    ...
+                )
+            },
             AppState::SelectPack => template_html!("templates/select_pack.html", ...),
             AppState::SelectSettings => template_html!("templates/select_settings.html", ...),
             AppState::Play => template_html!("templates/play.html"),
