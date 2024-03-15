@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 use serde::Deserialize;
 use rand::{seq::{IteratorRandom, SliceRandom}, Rng, RngCore};
 
@@ -69,7 +71,7 @@ impl RngCore for JsRandom {
     }
 }
 
-pub fn build_storyline(pack: &'static str, n: usize, players: Vec<String>) -> Vec<String> {
+pub fn build_storyline(pack: &'static str, n: usize, max_rule_duration: usize, players: Vec<String>) -> Vec<String> {
     let items = get_items(pack);
 
     for item in &items {
@@ -104,7 +106,7 @@ pub fn build_storyline(pack: &'static str, n: usize, players: Vec<String>) -> Ve
         if let Some(key) = item.key {
             if let Some(next_item) = items.iter().filter(|i2| i2.parent_key == Some(key)).choose(&mut JsRandom) {
                 let next_position = match item.ty {
-                    2 | 3 => JsRandom.gen_range(position + 1..=storyline.len()),
+                    2 | 3 => JsRandom.gen_range(position + 1..=min(storyline.len(), position + max_rule_duration)),
                     _ => position + 1,
                 };
                 let mut text = next_item.text.to_string();
@@ -125,7 +127,7 @@ pub fn build_storyline(pack: &'static str, n: usize, players: Vec<String>) -> Ve
 
 #[test]
 fn test() {
-    let players = vec!["Alice".to_string(), "Bob".to_string()];
-    let storyline = build_storyline("default", 20, players);
+    let players = vec!["Alice".to_string(), "Bob".to_string(), "Charlie".to_string()];
+    let storyline = build_storyline("default", 20, 15, players);
     println!("{:#?}", storyline);
 }
