@@ -1,6 +1,7 @@
-<main>
+<main id="settings">
     <h2>Confirm settings</h2>
-    <div id="settings">
+    
+    <div id="settings-list">
         <div class="setting">
             <h3>Party duration (slides)</h3>
             <input type="number" id="setting-party-duration" value="{{party_duration}}" onchange={{onchange_setting}} />
@@ -10,6 +11,7 @@
             <input type="number" id="setting-max-virus-duration" value="{{max_virus_duration}}" onchange={{onchange_setting}} />
         </div>
     </div>
+    
     <div id="bottom-buttons">
         <button onclick={{onclick_back}}>Back</button>
         <button onclick={{onclick_next}}>Next</button>
