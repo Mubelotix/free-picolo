@@ -6,35 +6,35 @@ use serde::{Serialize, Deserialize};
 struct RawItem {
     cycle_state: bool,
     #[serde(rename = "type")]
-    ty: i32,
+    ty: usize,
     text: String,
     key: String,
     parent_key: String,
     pack_name: String,
     language: String,
-    nb_players: i32,
+    nb_players: usize,
 }
 
 #[derive(Debug)]
 struct Item {
     cycle_state: bool,
-    ty: i32,
+    ty: usize,
     text: &'static str,
     key: Option<&'static str>,
     parent_key: Option<&'static str>,
     pack_name: &'static str,
     language: &'static str,
-    nb_players: i32,
+    nb_players: usize,
 }
 
 #[derive(Serialize, Debug)]
 struct SplitItem {
     cycle_state: bool,
-    ty: i32,
+    ty: usize,
     text: &'static str,
     key: Option<&'static str>,
     parent_key: Option<&'static str>,
-    nb_players: i32,
+    nb_players: usize,
 }
 
 fn parse_items() -> Vec<Item> {
@@ -61,18 +61,18 @@ fn parse_items() -> Vec<Item> {
 
     // Collect items from strings and raw items
     let mut items = Vec::new();
-    let first_i = raw_items.first().map(|raw_item| {
+    let first_i = raw_items.first().and_then(|raw_item| {
         raw_item.text.parse::<usize>().ok()
-    }).flatten().expect("Couldn't find first item");
+    }).expect("Couldn't find first item");
     for raw_item in raw_items {
         let text = raw_item.text.parse::<usize>().ok().map(|i| strings[i - first_i]).expect("Couldn't parse key to number");
         let key = raw_item.key.parse::<usize>().ok().map(|i| strings[i - first_i]).expect("Couldn't parse key to number");
         let parent_key = raw_item.parent_key.parse::<usize>().ok().map(|i| strings[i - first_i]).expect("Couldn't parse parent_key to number");
-        let pack_name = strings[raw_item.pack_name.parse::<usize>().ok().expect("Couldn't parse pack_name to number") - first_i];
-        let language = strings[raw_item.language.parse::<usize>().ok().expect("Couldn't parse language to number") - first_i];
+        let pack_name = raw_item.pack_name.parse::<usize>().ok().map(|i| strings[i - first_i]).expect("Couldn't parse pack_name to number");
+        let language = raw_item.language.parse::<usize>().ok().map(|i| strings[i - first_i]).expect("Couldn't parse language to number");
 
-        let key = if key == "" { None } else { Some(key) };
-        let parent_key = if parent_key == "" { None } else { Some(parent_key) };
+        let key = if key.is_empty() { None } else { Some(key) };
+        let parent_key = if parent_key.is_empty() { None } else { Some(parent_key) };
 
         let item = Item {
             cycle_state: raw_item.cycle_state,
