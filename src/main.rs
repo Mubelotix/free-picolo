@@ -18,17 +18,27 @@ pub enum AppState {
     Play,
 }
 
+pub enum Pack {
+    Default,
+    Hot,
+    Silly,
+    War,
+    Bar,
+}
+
 pub enum AppMsg {
     Back,
     Next,
     AddPlayer,
     OnPlayerChanged(web_sys::Event),
     OnPlayerRemoved(web_sys::MouseEvent),
+    OnPackSelected(Pack),
 }
 
 pub struct App {
     state: AppState,
     players: Vec<String>,
+    pack: Pack,
     storyline: Vec<String>,
     storyline_duration: usize,
     max_rule_duration: usize,
@@ -42,6 +52,7 @@ impl Component for App {
         Self {
             state: AppState::SelectPlayers,
             players: vec![String::new(), String::new()],
+            pack: Pack::Default,
             storyline: Vec::new(),
             storyline_duration: 30,
             max_rule_duration: 12,
@@ -89,6 +100,11 @@ impl Component for App {
 
                 true
             }
+            AppMsg::OnPackSelected(pack) => {
+                self.pack = pack;
+                self.state = AppState::SelectSettings;
+                true
+            }
         }
     }
 
@@ -114,7 +130,16 @@ impl Component for App {
                     ...
                 )
             },
-            AppState::SelectPack => template_html!("templates/select_pack.html", ...),
+            AppState::SelectPack => {
+                let onclick_default = ctx.link().callback(|_| AppMsg::OnPackSelected(Pack::Default));
+                let onclick_silly = ctx.link().callback(|_| AppMsg::OnPackSelected(Pack::Silly));
+                let onclick_bar = ctx.link().callback(|_| AppMsg::OnPackSelected(Pack::Bar));
+                let onclick_hot = ctx.link().callback(|_| AppMsg::OnPackSelected(Pack::Hot));
+                let onclick_war = ctx.link().callback(|_| AppMsg::OnPackSelected(Pack::War));
+                let player_count = self.players.len();
+
+                template_html!("templates/select_pack.html", ...)
+            },
             AppState::SelectSettings => template_html!("templates/select_settings.html", ...),
             AppState::Play => template_html!("templates/play.html"),
         }
