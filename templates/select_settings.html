@@ -1,5 +1,15 @@
 <main>
     <h2>Confirm settings</h2>
+    <div id="settings">
+        <div class="setting">
+            <h3>Party duration (slides)</h3>
+            <input type="number" id="setting-party-duration" value="{{party_duration}}" onchange={{onchange_setting}} />
+        </div>
+        <div class="setting">
+            <h3>Max role and rule duration</h3>
+            <input type="number" id="setting-max-rule-duration" value="{{max_rule_duration}}" onchange={{onchange_setting}} />
+        </div>
+    </div>
     <div id="bottom-buttons">
         <button onclick={{onclick_back}}>Back</button>
         <button onclick={{onclick_next}}>Next</button>

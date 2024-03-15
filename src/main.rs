@@ -33,6 +33,7 @@ pub enum AppMsg {
     OnPlayerChanged(web_sys::Event),
     OnPlayerRemoved(web_sys::MouseEvent),
     OnPackSelected(Pack),
+    OnSettingChanged(web_sys::Event),
 }
 
 pub struct App {
@@ -40,7 +41,7 @@ pub struct App {
     players: Vec<String>,
     pack: Pack,
     storyline: Vec<String>,
-    storyline_duration: usize,
+    party_duration: usize,
     max_rule_duration: usize,
 }
 
@@ -54,7 +55,7 @@ impl Component for App {
             players: vec![String::new(), String::new()],
             pack: Pack::Default,
             storyline: Vec::new(),
-            storyline_duration: 30,
+            party_duration: 30,
             max_rule_duration: 12,
         }
     }
@@ -89,7 +90,6 @@ impl Component for App {
                 let i: usize = target.id().trim_start_matches("player-input-").parse().unwrap();
                 let value = target.value();
                 self.players[i] = value;
-
                 false
             }
             AppMsg::OnPlayerRemoved(event) => {
@@ -97,13 +97,23 @@ impl Component for App {
                 let target: web_sys::Element = target.dyn_into().unwrap();
                 let i: usize = target.id().trim_start_matches("player-remove-").parse().unwrap();
                 self.players.remove(i);
-
                 true
             }
             AppMsg::OnPackSelected(pack) => {
                 self.pack = pack;
                 self.state = AppState::SelectSettings;
                 true
+            }
+            AppMsg::OnSettingChanged(event) => {
+                let Some(target) = event.target() else {return true};
+                let target: web_sys::HtmlInputElement = target.dyn_into().unwrap();
+                let value = target.value();
+                match target.id().trim_start_matches("setting-") {
+                    "party-duration" => self.party_duration = value.parse().unwrap(),
+                    "max-rule-duration" => self.max_rule_duration = value.parse().unwrap(),
+                    _ => (),
+                }
+                false
             }
         }
     }
@@ -140,7 +150,16 @@ impl Component for App {
 
                 template_html!("templates/select_pack.html", ...)
             },
-            AppState::SelectSettings => template_html!("templates/select_settings.html", ...),
+            AppState::SelectSettings => {
+                let party_duration = self.party_duration.to_string();
+                let max_rule_duration = self.max_rule_duration.to_string();
+
+                template_html!(
+                    "templates/select_settings.html",
+                    onchange_setting = { ctx.link().callback(AppMsg::OnSettingChanged) },
+                    ...
+                )
+            },
             AppState::Play => template_html!("templates/play.html"),
         }
     }
