@@ -80,21 +80,18 @@ impl RngCore for JsRandom {
 }
 
 pub fn build_storyline(pack: Pack, party_duration: usize, max_rule_duration: usize, players: &[String]) -> Vec<String> {
-    let items = get_items(pack);
-
-    for item in &items {
-        if item.cycle_state {
-            println!("{:#?}", item);
-        }
-    }
-
+    let mut items = get_items(pack);
     let mut storyline = Vec::new();
 
     while storyline.len() < party_duration {
-        let item = items.iter()
-            .filter(|item| item.ty != 15 && item.nb_players <= players.len() && item.parent_key.is_none())
+        let i = items
+            .iter()
+            .enumerate()
+            .filter(|(_, item)| item.ty != 15 && item.nb_players <= players.len() && item.parent_key.is_none())
+            .map(|(i, _)| i)
             .choose(&mut JsRandom)
             .unwrap();
+        let item = items.remove(i);
 
         let mut selected_players = players.iter().choose_multiple(&mut JsRandom, item.nb_players);
         selected_players.shuffle(&mut JsRandom);
